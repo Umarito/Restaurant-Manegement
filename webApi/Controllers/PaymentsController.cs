@@ -28,8 +28,13 @@ public class PaymentsController(IPaymentService PaymentService) : ControllerBase
     }
     
     [HttpGet("{PaymentId}")]
-    public async Task<Response<PaymentGetDto>> GetPaymentByIdAsync(int PaymentId)
+    public async Task<List<PaymentGetWithOrderDto>> GetPaymentByOrderIdAsync(int OrderId)
     {
-        return await PaymentService.GetPaymentByIdAsync(PaymentId);
+        return await PaymentService.GetPaymentByOrderIdAsync(OrderId);
     }
+    // [HttpGet("{PaymentId}")]
+    // public async Task<Response<PaymentGetDto>> GetPaymentByIdAsync(int PaymentId)
+    // {
+    //     return await PaymentService.GetPaymentByIdAsync(PaymentId);
+    // }
 }

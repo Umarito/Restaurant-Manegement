@@ -28,8 +28,14 @@ public class OrdersController(IOrderService OrderService) : ControllerBase
     }
     
     [HttpGet("{OrderId}")]
-    public async Task<Response<OrderGetDto>> GetOrderByIdAsync(int OrderId)
+    public async Task<List<OrderGetWithTableAndWaiterJoinDto>> GetOrderByWaiterIdAsync(int WaiterId)
     {
-        return await OrderService.GetOrderByIdAsync(OrderId);
+        return await OrderService.GetOrderByWaiterIdAsync(WaiterId);
     }
+    
+    // [HttpGet("{OrderId}")]
+    // public async Task<Response<OrderGetDto>> GetOrderByIdAsync(int OrderId)
+    // {
+    //     return await OrderService.GetOrderByIdAsync(OrderId);
+    // }
 }

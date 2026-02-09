@@ -27,9 +27,15 @@ public class MenuItemsController(IMenuItemService MenuItemService) : ControllerB
         return await MenuItemService.GetAllMenuItemsAsync(filter, pagedQuery);   
     }
     
-    [HttpGet("{MenuItemId}")]
-    public async Task<Response<MenuItemGetDto>> GetMenuItemByIdAsync(int MenuItemId)
+    [HttpGet("{cateforyId}")]
+    public async Task<List<MenuItemGetWithCategoryDto>> GetMenuItemsByCategoryIdAsync(int categoryId)
     {
-        return await MenuItemService.GetMenuItemByIdAsync(MenuItemId);
+        return await MenuItemService.GetMenuItemsByCategoryIdAsync(categoryId);
     }
+
+    // [HttpGet("{MenuItemId}")]
+    // public async Task<Response<MenuItemGetDto>> GetMenuItemByIdAsync(int MenuItemId)
+    // {
+    //     return await MenuItemService.GetMenuItemByIdAsync(MenuItemId);
+    // }
 }

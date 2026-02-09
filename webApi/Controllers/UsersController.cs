@@ -26,10 +26,15 @@ public class UsersController(IUserService UserService) : ControllerBase
     {
         return await UserService.GetAllUsersAsync(filter, pagedQuery);   
     }
-    
-    [HttpGet("{UserId}")]
-    public async Task<Response<UserGetDto>> GetUserByIdAsync(int UserId)
+    [HttpGet("{WaiterId}")]
+    public async Task<List<UserGetAsWaiterDto>> GetAllOrdersOfWaiterByIdAsync(int WaiterId)
     {
-        return await UserService.GetUserByIdAsync(UserId);
+        return await UserService.GetAllOrdersOfWaiterByIdAsync(WaiterId);
     }
+    
+    // [HttpGet("{UserId}")]
+    // public async Task<Response<UserGetDto>> GetUserByIdAsync(int UserId)
+    // {
+    //     return await UserService.GetUserByIdAsync(UserId);
+    // }
 }
