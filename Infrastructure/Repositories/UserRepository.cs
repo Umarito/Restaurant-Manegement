@@ -10,37 +10,29 @@ public class UserRepository(ApplicationDBContext applicationDBContext,ILogger<Us
     private readonly ApplicationDBContext _context = applicationDBContext;
     private readonly ILogger<UserRepository> _logger = logger;
 
-    public async Task<Response<string>> AddUserAsync(User User)
+    public async Task AddAsync(User User)
     {
-        try
-        {
-            _context.Users.Add(User);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "User was added successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.Users.Add(User);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<Response<string>> DeleteAsync(int UserId)
+    public async Task DeleteAsync(int UserId)
     {
-        try
-        {
-            var delete = await _context.Users.FindAsync(UserId);
-            _context.RemoveRange(delete);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "User was deleted successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        var delete = await _context.Users.FindAsync(UserId);
+        _context.RemoveRange(delete);
+        await _context.SaveChangesAsync();
     }
 
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users.FindAsync(id);
+    }
+
+    public async Task UpdateAsync(User User)
+    {
+        _context.Users.Update(User);
+        await _context.SaveChangesAsync();
+    }
     public async Task<List<User>> GetAllOrdersOfWaiterByIdAsync(int WaiterId)
     {
         return await _context.Users.Include(a=>a.OrdersAsWaiter).Where(a => a.Id==WaiterId && a.Role == UserRoles.Waiter).ToListAsync();
@@ -83,42 +75,5 @@ public class UserRepository(ApplicationDBContext applicationDBContext,ILogger<Us
             TotalCount = totalCount,
             TotalPages = totalPages
         };
-    }
-
-    public async Task<Response<User>> GetUserByIdAsync(int UserId)
-    {
-        try
-        {
-            var res = await _context.Users.FindAsync(UserId);
-            return new Response<User>(HttpStatusCode.OK,"The data that you were searching for:",res);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<User>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
-    }
-
-    public async Task<Response<string>> UpdateAsync(int UserId,User User)
-    {
-        try
-        {
-            var res = await _context.Users.FindAsync(UserId);
-            _context.Update(User);
-            if (res == null)
-            {
-                return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-                return new Response<string>(HttpStatusCode.OK, "User was updated successfully");
-            }
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
     }
 }

@@ -27,7 +27,7 @@ public class OrdersController(IOrderService OrderService) : ControllerBase
         return await OrderService.GetAllOrdersAsync(filter, pagedQuery);   
     }
     
-    [HttpGet("{OrderId}")]
+    [HttpGet("{WaiterId}")]
     public async Task<List<OrderGetWithTableAndWaiterJoinDto>> GetOrderByWaiterIdAsync(int WaiterId)
     {
         return await OrderService.GetOrderByWaiterIdAsync(WaiterId);

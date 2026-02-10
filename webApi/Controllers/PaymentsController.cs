@@ -27,7 +27,7 @@ public class PaymentsController(IPaymentService PaymentService) : ControllerBase
         return await PaymentService.GetAllPaymentsAsync(filter, pagedQuery);   
     }
     
-    [HttpGet("{PaymentId}")]
+    [HttpGet("{OrderId}")]
     public async Task<List<PaymentGetWithOrderDto>> GetPaymentByOrderIdAsync(int OrderId)
     {
         return await PaymentService.GetPaymentByOrderIdAsync(OrderId);

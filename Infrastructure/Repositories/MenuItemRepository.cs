@@ -10,37 +10,35 @@ public class MenuItemRepository(ApplicationDBContext applicationDBContext,ILogge
     private readonly ApplicationDBContext _context = applicationDBContext;
     private readonly ILogger<MenuItemRepository> _logger = logger;
 
-    public async Task<Response<string>> AddMenuItemAsync(MenuItem MenuItem)
+    public async Task AddAsync(MenuItem MenuItem)
     {
-        try
-        {
-            _context.MenuItems.Add(MenuItem);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "MenuItem was added successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.MenuItems.Add(MenuItem);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<Response<string>> DeleteAsync(int MenuItemId)
+    public async Task DeleteAsync(int MenuItemId)
     {
-        try
-        {
-            var delete = await _context.MenuItems.FindAsync(MenuItemId);
-            _context.RemoveRange(delete);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "MenuItem was deleted successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        var delete = await _context.MenuItems.FindAsync(MenuItemId);
+        _context.RemoveRange(delete);
+        await _context.SaveChangesAsync();
     }
 
+    public async Task<MenuItem?> GetByIdAsync(int id)
+    {
+        return await _context.MenuItems.FindAsync(id);
+    }
+
+    public async Task UpdateAsync(MenuItem MenuItem)
+    {
+        _context.MenuItems.Update(MenuItem);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<MenuItem>> GetMenuItemsByCategoryIdAsync(int categoryId)
+    {
+        return await _context.MenuItems.Include(a => a.Category).Where(a => a.CategoryId == categoryId).ToListAsync();
+    }
+    
     public async Task<PagedResult<MenuItem>> GetAllMenuItemsAsync(MenuItemFilter filter, PagedQuery pagedQuery)
     {
         var page = pagedQuery.Page <= 0 ? 1 : pagedQuery.Page;
@@ -73,47 +71,5 @@ public class MenuItemRepository(ApplicationDBContext applicationDBContext,ILogge
             TotalCount = totalCount,
             TotalPages = totalPages
         };
-    }
-
-    public async Task<Response<MenuItem>> GetMenuItemByIdAsync(int MenuItemId)
-    {
-        try
-        {
-            var res = await _context.MenuItems.FindAsync(MenuItemId);
-            return new Response<MenuItem>(HttpStatusCode.OK,"The data that you were searching for:",res);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<MenuItem>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
-    }
-
-    public async Task<List<MenuItem>> GetMenuItemsByCategoryIdAsync(int categoryId)
-    {
-        return await _context.MenuItems.Include(a => a.Category).Where(a => a.CategoryId == categoryId).ToListAsync();
-    }
-
-    public async Task<Response<string>> UpdateAsync(int MenuItemId,MenuItem MenuItem)
-    {
-        try
-        {
-            var res = await _context.MenuItems.FindAsync(MenuItemId);
-            _context.Update(MenuItem);
-            if (res == null)
-            {
-                return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-                return new Response<string>(HttpStatusCode.OK, "MenuItem was updated successfully");
-            }
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
     }
 }

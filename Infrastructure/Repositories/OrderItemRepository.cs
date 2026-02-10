@@ -10,35 +10,28 @@ public class OrderItemRepository(ApplicationDBContext applicationDBContext,ILogg
     private readonly ApplicationDBContext _context = applicationDBContext;
     private readonly ILogger<OrderItemRepository> _logger = logger;
 
-    public async Task<Response<string>> AddOrderItemAsync(OrderItem OrderItem)
+    public async Task AddAsync(OrderItem OrderItem)
     {
-        try
-        {
-            _context.OrderItems.Add(OrderItem);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "OrderItem was added successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.OrderItems.Add(OrderItem);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<Response<string>> DeleteAsync(int OrderItemId)
+    public async Task DeleteAsync(int OrderItemId)
     {
-        try
-        {
-            var delete = await _context.OrderItems.FindAsync(OrderItemId);
-            _context.RemoveRange(delete);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "OrderItem was deleted successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        var delete = await _context.OrderItems.FindAsync(OrderItemId);
+        _context.RemoveRange(delete);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<OrderItem?> GetByIdAsync(int id)
+    {
+        return await _context.OrderItems.FindAsync(id);
+    }
+
+    public async Task UpdateAsync(OrderItem OrderItem)
+    {
+        _context.OrderItems.Update(OrderItem);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<PagedResult<OrderItem>> GetAllOrderItemsAsync(OrderItemFilter filter, PagedQuery pagedQuery)
@@ -67,42 +60,5 @@ public class OrderItemRepository(ApplicationDBContext applicationDBContext,ILogg
             TotalCount = totalCount,
             TotalPages = totalPages
         };
-    }
-
-    public async Task<Response<OrderItem>> GetOrderItemByIdAsync(int OrderItemId)
-    {
-        try
-        {
-            var res = await _context.OrderItems.FindAsync(OrderItemId);
-            return new Response<OrderItem>(HttpStatusCode.OK,"The data that you were searching for:",res);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<OrderItem>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
-    }
-
-    public async Task<Response<string>> UpdateAsync(int OrderItemId,OrderItem OrderItem)
-    {
-        try
-        {
-            var res = await _context.OrderItems.FindAsync(OrderItemId);
-            _context.Update(OrderItem);
-            if (res == null)
-            {
-                return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-                return new Response<string>(HttpStatusCode.OK, "OrderItem was updated successfully");
-            }
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
     }
 }

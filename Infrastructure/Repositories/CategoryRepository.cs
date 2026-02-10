@@ -10,35 +10,17 @@ public class CategoryRepository(ApplicationDBContext applicationDBContext,ILogge
     private readonly ApplicationDBContext _context = applicationDBContext;
     private readonly ILogger<CategoryRepository> _logger = logger;
 
-    public async Task<Response<string>> AddCategoryAsync(Category Category)
+    public async Task AddAsync(Category category)
     {
-        try
-        {
-            _context.Categories.Add(Category);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "Category was added successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<Response<string>> DeleteAsync(int CategoryId)
+    public async Task DeleteAsync(int CategoryId)
     {
-        try
-        {
-            var delete = await _context.Categories.FindAsync(CategoryId);
-            _context.RemoveRange(delete);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "Category was deleted successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        var delete = await _context.Categories.FindAsync(CategoryId);
+        _context.RemoveRange(delete);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<PagedResult<Category>> GetAllCategoriesAsync(CategoryFilter filter, PagedQuery pagedQuery)
@@ -69,40 +51,14 @@ public class CategoryRepository(ApplicationDBContext applicationDBContext,ILogge
         };
     }
 
-    public async Task<Response<Category>> GetCategoryByIdAsync(int CategoryId)
+    public async Task<Category?> GetByIdAsync(int id)
     {
-        try
-        {
-            var res = await _context.Categories.FindAsync(CategoryId);
-            return new Response<Category>(HttpStatusCode.OK,"The data that you were searching for:",res);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<Category>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        return await _context.Categories.FindAsync(id);
     }
 
-    public async Task<Response<string>> UpdateAsync(int CategoryId,Category Category)
+    public async Task UpdateAsync(Category category)
     {
-        try
-        {
-            var res = await _context.Categories.FindAsync(CategoryId);
-            _context.Categories.Update(Category);
-            if (res == null)
-            {
-                return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-                return new Response<string>(HttpStatusCode.OK, "Category was updated successfully");
-            }
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.Categories.Update(category);
+        await _context.SaveChangesAsync();
     }
 }

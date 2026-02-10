@@ -2,9 +2,9 @@ using WebApi.DTOs;
 
 public interface ITableRepository
 {
-    Task<Response<string>> AddTableAsync(Table Table);
-    Task<Response<Table>> GetTableByIdAsync(int TableId);
+    Task AddAsync(Table Table);
+    Task<Table?> GetByIdAsync(int id);
+    Task DeleteAsync(int Table);
+    Task UpdateAsync(Table Table);
     Task<PagedResult<Table>> GetAllTablesAsync(TableFilter filter, PagedQuery query);
-    Task<Response<string>> DeleteAsync(int TableId);
-    Task<Response<string>> UpdateAsync(int TableId,Table Table);
 }

@@ -10,35 +10,33 @@ public class PaymentRepository(ApplicationDBContext applicationDBContext,ILogger
     private readonly ApplicationDBContext _context = applicationDBContext;
     private readonly ILogger<PaymentRepository> _logger = logger;
 
-    public async Task<Response<string>> AddPaymentAsync(Payment Payment)
+    public async Task AddAsync(Payment Payment)
     {
-        try
-        {
-            _context.Payments.Add(Payment);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "Payment was added successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        _context.Payments.Add(Payment);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<Response<string>> DeleteAsync(int PaymentId)
+    public async Task DeleteAsync(int PaymentId)
     {
-        try
-        {
-            var delete = await _context.Payments.FindAsync(PaymentId);
-            _context.RemoveRange(delete);
-            await _context.SaveChangesAsync();
-            return new Response<string>(HttpStatusCode.OK, "Payment was deleted successfully");
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
+        var delete = await _context.Payments.FindAsync(PaymentId);
+        _context.RemoveRange(delete);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<Payment?> GetByIdAsync(int id)
+    {
+        return await _context.Payments.FindAsync(id);
+    }
+
+    public async Task UpdateAsync(Payment Payment)
+    {
+        _context.Payments.Update(Payment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Payment>> GetPaymentByOrderIdAsync(int OrderId)
+    {
+        return await _context.Payments.Include(a => a.Order).Where(a => a.OrderId == OrderId).ToListAsync();
     }
 
     public async Task<PagedResult<Payment>> GetAllPaymentsAsync(PaymentFilter filter, PagedQuery pagedQuery)
@@ -75,47 +73,5 @@ public class PaymentRepository(ApplicationDBContext applicationDBContext,ILogger
             TotalCount = totalCount,
             TotalPages = totalPages
         };
-    }
-
-    public async Task<Response<Payment>> GetPaymentByIdAsync(int PaymentId)
-    {
-        try
-        {
-            var res = await _context.Payments.FindAsync(PaymentId);
-            return new Response<Payment>(HttpStatusCode.OK,"The data that you were searching for:",res);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<Payment>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
-    }
-
-    public async Task<List<Payment>> GetPaymentByOrderIdAsync(int OrderId)
-    {
-        return await _context.Payments.Include(a => a.Order).Where(a => a.OrderId == OrderId).ToListAsync();
-    }
-
-    public async Task<Response<string>> UpdateAsync(int PaymentId,Payment Payment)
-    {
-        try
-        {
-            var res = await _context.Payments.FindAsync(PaymentId);
-            _context.Update(Payment);
-            if (res == null)
-            {
-                return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-                return new Response<string>(HttpStatusCode.OK, "Payment was updated successfully");
-            }
-        }
-        catch(Exception ex)
-        {
-            _logger.LogWarning(ex.Message);
-            return new Response<string>(HttpStatusCode.InternalServerError, "Internal Server Error");
-        }
     }
 }

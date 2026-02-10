@@ -2,10 +2,10 @@ using WebApi.DTOs;
 
 public interface IMenuItemRepository
 {
-    Task<Response<string>> AddMenuItemAsync(MenuItem MenuItem);
-    Task<Response<MenuItem>> GetMenuItemByIdAsync(int MenuItemId);
+    Task AddAsync(MenuItem MenuItem);
+    Task<MenuItem?> GetByIdAsync(int id);
+    Task DeleteAsync(int MenuItem);
+    Task UpdateAsync(MenuItem MenuItem);
     Task<PagedResult<MenuItem>> GetAllMenuItemsAsync(MenuItemFilter filter, PagedQuery query);
-    Task<Response<string>> DeleteAsync(int MenuItemId);
-    Task<Response<string>> UpdateAsync(int MenuItemId,MenuItem MenuItem);
     Task<List<MenuItem>> GetMenuItemsByCategoryIdAsync(int categoryId);
 }
